@@ -233,10 +233,26 @@ export async function POST(request: Request) {
     } else {
       return new Response(stream);
     }
-  } catch (error) {
+} catch (error) {
+    console.error('=== CHAT API ERROR ===');
+    console.error('Error type:', typeof error);
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('Error message:', error instanceof Error ? error.message : error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('====================');
+    
     if (error instanceof ChatSDKError) {
       return error.toResponse();
     }
+    
+    return new Response(JSON.stringify({ 
+      error: 'Internal Server Error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      type: typeof error
+    }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
